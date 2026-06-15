@@ -1,17 +1,17 @@
 {
-  "name": "dominius-backend",
+  "name": "dominus-api",
   "version": "1.0.0",
-  "description": "Backend para Dominius - Astronauta Virtual usando DeepSeek API",
+  "description": "Backend para Dominius - Astronauta Virtual usando Grok API (xAI)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js"
   },
   "keywords": [
-    "deepseek",
-    "chat",
-    "astronauta",
-    "eben-ezer",
+    "grok-api",
+    "chatbot",
+    "astronauta-virtual",
+    "eben-ezer-aviation",
     "steam",
     "aerospace"
   ],
