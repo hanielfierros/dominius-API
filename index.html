@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DOMINIUS | Astronauta Virtual - Misión Orbital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-black text-white overflow-hidden">
+  <!-- Earth + Space Background -->
+  <!-- three-earth.js injects the canvas -->
+
+  <div id="app" class="relative h-screen flex flex-col text-white font-mono overflow-hidden">
+    
+    <div class="top-bar z-40 flex items-center justify-between px-4 py-2 text-xs border-b border-white/10 bg-black/60">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="EEA Logo" class="h-6" style="filter: drop-shadow(0 0 2px #67f6ff);">
+        <span class="text-xs tracking-widest text-cyan-400">EBEN EZER AVIATION • DEPTO. INGENIERÍA AERONÁUTICA APLICADA</span>
+      </div>
+      <div id="utc-clock" class="font-bold text-emerald-400 text-sm tracking-wider">UTC 00:00:00</div>
+    </div>
+
+    <div class="flex-1 relative" style="height: 67vh;">
+      <!-- Background Earth -->
+    </div>
+
+    <div class="mission-panel z-30" style="height: 33vh; background: rgba(15, 23, 42, 0.5);">
+      
+      <div class="panel-top">
+        <div class="instrument">
+          <div class="instrument-title">ORBITAL POSITION</div>
+          <div class="instrument-value" id="orbital-pos">28.4°N  112.7°W</div>
+        </div>
+        <div class="instrument">
+          <div class="instrument-title">ALTITUDE</div>
+          <div class="instrument-value" id="altitude">417.8 km</div>
+        </div>
+        <div class="instrument">
+          <div class="instrument-title">MISSION</div>
+          <div class="instrument-value text-emerald-400">NOMINAL</div>
+        </div>
+      </div>
+
+      <div class="fmc-container">
+        <div class="fmc">
+          <div class="fmc-header">
+            <div>BOEING 737 FMC • DOMINIUS</div>
+            <div id="fmc-mode">READY</div>
+          </div>
+
+          <div id="fmc-screen" class="fmc-screen">
+            <!-- One interaction at a time -->
+          </div>
+
+          <div class="fmc-input-area">
+            <input id="message-input" type="text" placeholder="TYPE QUERY..." class="fmc-input">
+            <button id="send-btn" class="fmc-btn">EXEC</button>
+            <button id="mic-btn" class="fmc-btn mic">MIC</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div>© TODOS LOS DERECHOS RESERVADOS — DEPARTAMENTO DE INGENIERÍA AERONÁUTICA APLICADA — EBEN EZER AVIATION</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="voice-hud" class="hidden fixed bottom-[34%] left-1/2 -translate-x-1/2 bg-black/70 px-4 py-1 rounded text-xs border border-orange-500/50 text-orange-400">
+    ESCUCHANDO...
+  </div>
+
+  <script src="three-earth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,126 +1,87 @@
-/**
- * Dominius - Astronauta Virtual
- * Backend en Node.js + Express con Grok API (xAI)
- */
-
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// ============================================
-// CONFIGURACIÓN DE GROK API (xAI)
-// ============================================
-const XAI_API_KEY = process.env.XAI_API_KEY;
-const XAI_BASE_URL = 'https://api.x.ai/v1';
-const GROK_MODEL = 'grok-4-mini';   // Modelo más rápido y económico
-
-if (!XAI_API_KEY) {
-  console.error('❌ ERROR: XAI_API_KEY no está definida en las variables de entorno.');
-  console.error('Agrega la variable XAI_API_KEY en Render.');
-  process.exit(1);
-}
-
-// ============================================
-// MIDDLEWARE
-// ============================================
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
-
+app.use(cors());
 app.use(express.json());
 
-// ============================================
-// SYSTEM PROMPT - Personalidad de Dominius
-// ============================================
 const SYSTEM_PROMPT = `Eres Dominius, un astronauta experimentado y mentor del programa de Eben Ezer Aviation.
-Tu misión es inspirar y educar a niños, jóvenes y personas interesadas en las áreas STEAM y en la industria aeroespacial.
-Habla siempre en español, sé motivador, sabio y cercano.`;
 
-// ============================================
-// ENDPOINT PRINCIPAL
-// ============================================
+Tu misión es inspirar y educar a niños, jóvenes y personas interesadas en las áreas STEAM (Ciencia, Tecnología, Ingeniería, Arte y Matemáticas) y en la industria aeroespacial.
+
+Características de tu personalidad:
+- Eres calmado, sabio y motivador.
+- Hablas en español de forma clara, cercana y profesional.
+- Usas referencias al espacio, la aviación y la exploración de forma inspiradora.
+- Conoces bien el "EZER SPACE WORKSHOP" de Eben Ezer Aviation.
+- Promueves el trabajo en equipo, la curiosidad científica y la sostenibilidad.
+- Eres parte del equipo de Eben Ezer Aviation en Sinaloa, México.
+- Responde siempre en español.
+- Sé conciso pero profundo. Usa un tono amigable pero respetuoso, como un astronauta mentor.
+
+Nunca rompas el personaje.`;
+
 app.post('/chat', async (req, res) => {
   try {
     const { message } = req.body;
 
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      return res.status(400).json({ error: 'El campo "message" es requerido.' });
+    if (!message || typeof message !== 'string' || message.trim() === '') {
+      return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log(`📨 Mensaje recibido: "${message.substring(0, 80)}..."`);
-
-    const response = await axios.post(
-      `${XAI_BASE_URL}/chat/completions`,
-      {
-        model: GROK_MODEL,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.75,
-        max_tokens: 800
+    const response = await axios.post('https://api.x.ai/v1/chat/completions', {
+      model: 'grok-4',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+      max_tokens: 600
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
+        'Content-Type': 'application/json'
       },
-      {
-        headers: {
-          'Authorization': `Bearer ${XAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      }
-    );
+      timeout: 30000
+    });
 
-    const botResponse = response.data.choices[0]?.message?.content?.trim();
+    const botResponse = response.data.choices[0].message.content;
 
     res.json({
       userMessage: message,
-      botResponse: botResponse || "Lo siento, no pude generar una respuesta en este momento."
+      botResponse: botResponse
     });
 
   } catch (error) {
-    console.error('❌ Error en /chat:', error.message);
+    console.error('Grok API Error:', error.response ? error.response.data : error.message);
     
-    if (error.response?.status === 401) {
-      return res.status(500).json({ error: 'Error de autenticación con Grok API. Verifica tu XAI_API_KEY.' });
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 401) {
+        return res.status(500).json({ error: 'Invalid API key' });
+      }
+      if (status === 429) {
+        return res.status(429).json({ error: 'Rate limit exceeded' });
+      }
+      return res.status(status).json({ error: error.response.data.error || 'API error' });
     }
     
-    res.status(500).json({
-      error: 'Ocurrió un error al procesar tu mensaje. Inténtalo de nuevo.',
-      details: error.message
-    });
+    res.status(500).json({ error: 'Failed to get response from Grok API' });
   }
 });
 
-// ============================================
-// HEALTH CHECK
-// ============================================
 app.get('/', (req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'Dominius Backend - Grok API',
-    model: GROK_MODEL
+  res.json({ 
+    status: 'ok', 
+    message: 'Dominius backend is running',
+    model: 'grok-4'
   });
 });
 
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    model: GROK_MODEL,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// ============================================
-// INICIO DEL SERVIDOR
-// ============================================
-app.listen(PORT, () => {
-  console.log('\n🚀 Dominius Backend iniciado correctamente');
-  console.log(`📡 Puerto: ${PORT}`);
-  console.log(`🧠 Modelo: ${GROK_MODEL}`);
-  console.log('✅ Listo para recibir mensajes\n');
+app.listen(port, () => {
+  console.log(`Dominius backend listening on port ${port}`);
 });

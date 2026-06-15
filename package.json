@@ -1,22 +1,11 @@
 {
-  "name": "dominus-api",
+  "name": "dominius-backend",
   "version": "1.0.0",
-  "description": "Backend para Dominius - Astronauta Virtual usando Grok API (xAI)",
+  "description": "Backend for Dominius using Grok API (xAI)",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "node index.js"
   },
-  "keywords": [
-    "grok-api",
-    "chatbot",
-    "astronauta-virtual",
-    "eben-ezer-aviation",
-    "steam",
-    "aerospace"
-  ],
-  "author": "Eben Ezer Aviation",
-  "license": "MIT",
   "dependencies": {
     "axios": "^1.7.2",
     "cors": "^2.8.5",
